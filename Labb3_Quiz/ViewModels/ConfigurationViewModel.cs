@@ -6,7 +6,6 @@ using System.Windows;
 
 namespace Labb3_Quiz.ViewModels;
 
-// ViewModel för redigeringsvyn (lägg till/ta bort frågor, öppna pack-inställningar)
 public class ConfigurationViewModel : ViewModelBase
 {
     private readonly MainWindowViewModel? _mainWindowViewModel;
