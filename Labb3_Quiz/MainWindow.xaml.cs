@@ -3,7 +3,6 @@ using System.Windows;
 
 namespace Labb3_Quiz;
 
-// Huvudfönster (sätter DataContext och hanterar fullskärm)
 public partial class MainWindow : Window
 {
     public MainWindow()
@@ -32,3 +31,4 @@ public partial class MainWindow : Window
         }
     }
 }
+

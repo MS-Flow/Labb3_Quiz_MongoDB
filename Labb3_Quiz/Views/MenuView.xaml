@@ -18,7 +18,7 @@
                 InputGestureText="Ctrl+N"
                 Command="{Binding CreateNewPackCommand}"
                 IsEnabled="{Binding IsPlayMode, Converter={StaticResource BoolInverterConverter}}"/>
-            
+
             <MenuItem 
                 Header="_Select Question Pack"
                 Icon="{fa:Icon FolderOpen}"
@@ -43,7 +43,7 @@
                     </DataTemplate>
                 </MenuItem.ItemTemplate>
             </MenuItem>
-            
+
             <MenuItem 
                 Header="_Delete Question Pack"
                 InputGestureText="Ctrl+Del"
@@ -89,6 +89,12 @@
                 InputGestureText="Alt+E, O"
                 Icon="{fa:Icon Sliders}"
                 Command="{Binding ConfigurationViewModel.OpenPackOptionsCommand}"
+                IsEnabled="{Binding IsPlayMode, Converter={StaticResource BoolInverterConverter}}"/>
+            <Separator/>
+            <MenuItem
+                Header="Manage _Categories..."
+                Icon="{fa:Icon Tags}"
+                Command="{Binding ManageCategoriesCommand}"
                 IsEnabled="{Binding IsPlayMode, Converter={StaticResource BoolInverterConverter}}"/>
         </MenuItem>
 

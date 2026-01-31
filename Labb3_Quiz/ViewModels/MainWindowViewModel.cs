@@ -205,7 +205,7 @@ public class MainWindowViewModel : ViewModelBase
         {
 
             var vm = new ManageCategoriesViewModel(_storageService, _dialogService, Categories);
-            var dlg = new Labb3_Quiz_MongoDB.Views.Dialogs.ManageCategoriesDialog
+            var dlg = new Labb3_Quiz.Views.Dialogs.ManageCategoriesDialog
             {
                 DataContext = vm,
                 Owner = Application.Current.MainWindow

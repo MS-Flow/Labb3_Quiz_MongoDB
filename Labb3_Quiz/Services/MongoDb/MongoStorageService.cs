@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 
 namespace Labb3_Quiz.Services.MongoDb;
 
@@ -19,9 +22,23 @@ public class MongoStorageService : IStorageService
     private readonly IMongoCollection<QuestionPack> _packs;
     private readonly IMongoCollection<Category> _categories;
 
+    private static bool _bsonConfigured;
+
+    private static void EnsureBsonConfigured()
+    {
+        if (_bsonConfigured) return;
+
+        var guidSerializer = new GuidSerializer(GuidRepresentation.Standard);
+        BsonSerializer.RegisterSerializer(guidSerializer);
+        BsonSerializer.RegisterSerializer(new NullableSerializer<Guid>(guidSerializer));
+
+        _bsonConfigured = true;
+    }
 
     public MongoStorageService(MongoDbSettings? settings = null)
     {
+        EnsureBsonConfigured();
+
         settings ??= MongoDbSettings.FromEnvironment();
 
         var client = new MongoClient(settings.ConnectionString);

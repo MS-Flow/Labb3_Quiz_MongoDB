@@ -21,21 +21,19 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <!-- Main quiz medans spelet kör -->
         <Grid Grid.Row="0" Visibility="{Binding IsRoundActive, Converter={StaticResource BoolToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-           
+
             <Grid Grid.Row="0" VerticalAlignment="Center">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <!-- Question text -->
                 <TextBlock 
                     Grid.Row="0"
                     Text="{Binding CurrentQuestion.Text}"
@@ -47,7 +45,6 @@
                     VerticalAlignment="Center"
                     Margin="40,0,40,20"/>
 
-                <!-- Question räknare -->
                 <TextBlock 
                     Grid.Row="1"
                     FontSize="14"
@@ -62,7 +59,6 @@
                 </TextBlock>
             </Grid>
 
-            <!-- svarsalternativ -->
             <Grid Grid.Row="1" Margin="40,40,40,40">
                 <ItemsControl ItemsSource="{Binding ShuffledOptions}">
                     <ItemsControl.ItemsPanel>
@@ -88,14 +84,13 @@
                                 Command="{Binding DataContext.SubmitAnswerCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                 CommandParameter="{Binding}"
                                 IsEnabled="{Binding DataContext.HasAnswered, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InverseBoolConverter}}">
-                                
+
                             </Button>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
 
-            <!-- feedback (automatisk övergång till nästa fråga efter 2 sekunder) -->
             <Grid Grid.Row="0" Grid.RowSpan="2" 
                   Visibility="{Binding HasAnswered, Converter={StaticResource BoolToVisibilityConverter}}"
                   Background="#E0FFFFFF" 
@@ -128,7 +123,6 @@
                 </StackPanel>
             </Grid>
 
-            <!-- Timer -->
             <TextBlock 
                 Grid.Row="0" Grid.RowSpan="2"
                 Text="{Binding RemainingTime}"
@@ -140,7 +134,6 @@
                 Foreground="Black"/>
         </Grid>
 
-        <!-- Resultat (när quizet är klart) -->
         <components:ResultView Grid.Row="0" 
                                Visibility="{Binding ShowResults, Converter={StaticResource BoolToVisibilityConverter}}"/>
     </Grid>
