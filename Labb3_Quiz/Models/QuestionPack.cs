@@ -10,6 +10,12 @@ public class QuestionPack
     public Guid Id { get; set; } = Guid.NewGuid();
     public string Name { get; set; } = "New Pack";
     public PackDifficulty Difficulty { get; set; } = PackDifficulty.Medium;
+
     public int TimePerQuestionSeconds { get; set; } = 20;
+
+    public Guid? CategoryId { get; set; }
+
+    public string? CategoryName { get; set; }
+
     public List<Question> Questions { get; set; } = new();
 }

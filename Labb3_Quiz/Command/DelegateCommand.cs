@@ -3,7 +3,6 @@ using System.Windows.Input;
 
 namespace Labb3_Quiz.Command;
 
-// Command-implementation för WPF data-binding
 public class DelegateCommand : ICommand
 {
     private readonly Action<object?> execute;

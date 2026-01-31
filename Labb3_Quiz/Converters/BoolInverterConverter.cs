@@ -4,7 +4,6 @@ using System.Windows.Data;
 
 namespace Labb3_Quiz.Converters;
 
-// Inverterar bool-värden (true → false, false → true)
 public class BoolInverterConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

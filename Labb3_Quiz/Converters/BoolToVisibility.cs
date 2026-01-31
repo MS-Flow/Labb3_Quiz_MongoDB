@@ -5,7 +5,6 @@ using System.Windows.Data;
 
 namespace Labb3_Quiz.Converters;
 
-// Konverterar bool till Visibility (true = Visible, false = Collapsed)
 public class BoolToVisibilityConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
