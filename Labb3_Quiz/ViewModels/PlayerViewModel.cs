@@ -7,12 +7,11 @@ using System.Windows.Threading;
 
 namespace Labb3_Quiz.ViewModels;
 
-// ViewModel för quiz-spel (hanterar timer, poäng, blandning, feedback)
 public class PlayerViewModel : ViewModelBase
 {
     private readonly MainWindowViewModel? _mainWindowViewModel;
     private readonly IDialogService _dialogService;
-    private readonly DispatcherTimer _timer; 
+    private readonly DispatcherTimer _timer;
     private readonly DispatcherTimer _feedbackTimer;
     private List<Question> _shuffledQuestions = new();
     private List<AnswerOption> _shuffledOptions = new();
@@ -48,7 +47,6 @@ public class PlayerViewModel : ViewModelBase
         }
     }
 
-    // Reagerar på ändringar i huvud-ViewModel (ActivePack, IsPlayMode)
     private void MainViewModel_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(MainWindowViewModel.ActivePack))
@@ -92,8 +90,8 @@ public class PlayerViewModel : ViewModelBase
     public int CurrentQuestionNumber => _currentQuestionIndex >= 0 ? _currentQuestionIndex + 1 : 0;
     public int TotalQuestions => _shuffledQuestions.Count;
     public int PackQuestionCount => ActivePack?.Questions.Count ?? 0;
-    public Question? CurrentQuestion => _currentQuestionIndex >= 0 && _currentQuestionIndex < _shuffledQuestions.Count 
-        ? _shuffledQuestions[_currentQuestionIndex] 
+    public Question? CurrentQuestion => _currentQuestionIndex >= 0 && _currentQuestionIndex < _shuffledQuestions.Count
+        ? _shuffledQuestions[_currentQuestionIndex]
         : null;
 
     public int RemainingTime
@@ -164,7 +162,7 @@ public class PlayerViewModel : ViewModelBase
         set
         {
             _isRoundActive = value;
-                RaisePropertyChanged();
+            RaisePropertyChanged();
         }
     }
 
@@ -233,7 +231,6 @@ public class PlayerViewModel : ViewModelBase
         }
     }
 
-    // Feedback timer: väntar 2 sek innan nästa fråga
     private void FeedbackTimer_Tick(object? sender, EventArgs e)
     {
         _feedbackDelaySeconds--;
@@ -250,7 +247,6 @@ public class PlayerViewModel : ViewModelBase
         _feedbackTimer.Start();
     }
 
-    // Hanterar svar (kontrollerar rätt/fel, ökar poäng, visar feedback)
     private void SubmitAnswer(object? parameter)
     {
         if (parameter is not AnswerOption selectedOption || _hasAnswered) return;
