@@ -1,52 +1,65 @@
 ﻿using Labb3_Quiz.Command;
 using Labb3_Quiz.Models;
 using Labb3_Quiz.Services;
+using Labb3_Quiz.Services.MongoDb;
 using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace Labb3_Quiz.ViewModels;
 
-// Huvud-ViewModel (koordinerar packs, laddning/sparande, edit/play mode)
 public class MainWindowViewModel : ViewModelBase
 {
     private readonly IStorageService _storageService;
     private readonly IDialogService _dialogService;
+
     private QuestionPackViewModel? _activePack;
+
     private bool _isPlayMode;
+
     private bool _isFullScreen;
 
     public MainWindowViewModel()
     {
-        _storageService = new LocalAppDataStorageService();
+        _storageService = new MongoStorageService();
+
         _dialogService = new DialogService();
+
         Packs = new ObservableCollection<QuestionPackViewModel>();
+        Categories = new ObservableCollection<Category>();
+
         PlayerViewModel = new PlayerViewModel(this, _dialogService);
         ConfigurationViewModel = new ConfigurationViewModel(this, _dialogService);
 
         ShowConfigCommand = new DelegateCommand(_ => IsPlayMode = false);
         ShowPlayerCommand = new DelegateCommand(_ => IsPlayMode = true, _ => ActivePack != null && ActivePack.Questions.Count > 0);
         ToggleFullScreenCommand = new DelegateCommand(_ => IsFullScreen = !IsFullScreen);
-        CreateNewPackCommand = new DelegateCommand(_ => CreateNewPack());
-        RemoveQuestionPackCommand = new DelegateCommand(_ => RemoveQuestionPack(), _ => ActivePack != null);
+
+        CreateNewPackCommand = new DelegateCommand(async _ => await CreateNewPackAsync());
+        RemoveQuestionPackCommand = new DelegateCommand(async _ => await RemoveQuestionPackAsync(), _ => ActivePack != null);
         SaveAllCommand = new DelegateCommand(async _ => await SaveAllAsync());
+
         SetActivePackCommand = new DelegateCommand(pack => ActivePack = pack as QuestionPackViewModel, _ => !_isPlayMode);
         ExitProgramCommand = new DelegateCommand(_ => Application.Current.Shutdown());
         ImportQuestionsCommand = new DelegateCommand(_ => ImportQuestions());
+        ManageCategoriesCommand = new DelegateCommand(_ => ManageCategories());
 
-        _ = LoadPacksAsync();
+        _ = LoadAllAsync();
     }
 
     public ObservableCollection<QuestionPackViewModel> Packs { get; }
+    public ObservableCollection<Category> Categories { get; }
 
     public QuestionPackViewModel? ActivePack
     {
         get => _activePack;
         set
         {
+
             if (_isPlayMode && value != _activePack)
                 IsPlayMode = false;
             _activePack = value;
             RaisePropertyChanged();
+
             ShowPlayerCommand.RaiseCanExecuteChanged();
             RemoveQuestionPackCommand.RaiseCanExecuteChanged();
             ConfigurationViewModel?.RaisePropertyChanged(nameof(ConfigurationViewModel.ActivePack));
@@ -90,44 +103,70 @@ public class MainWindowViewModel : ViewModelBase
     public DelegateCommand SetActivePackCommand { get; }
     public DelegateCommand ExitProgramCommand { get; }
     public DelegateCommand ImportQuestionsCommand { get; }
+    public DelegateCommand ManageCategoriesCommand { get; }
 
-    private void CreateNewPack()
-    {
-        var pack = new QuestionPack { Name = "New Pack" };
-        var packViewModel = new QuestionPackViewModel(pack);
-        Packs.Add(packViewModel);
-        ActivePack = packViewModel;
-    }
-
-    private void RemoveQuestionPack()
-    {
-        if (ActivePack == null) return;
-        if (_dialogService.ShowConfirm($"Delete pack '{ActivePack.Name}'?", "Delete Pack"))
-        {
-            Packs.Remove(ActivePack);
-            ActivePack = Packs.FirstOrDefault();
-        }
-    }
-
-    private async Task LoadPacksAsync()
+    private async Task LoadAllAsync()
     {
         try
         {
-            var packs = await _storageService.LoadPacksAsync();
+            var categories = await _storageService.GetAllCategoriesAsync();
+            var packs = await _storageService.GetAllPacksAsync();
+
             Application.Current.Dispatcher.Invoke(() =>
             {
+                Categories.Clear();
+                foreach (var c in categories) Categories.Add(c);
+
                 Packs.Clear();
                 foreach (var pack in packs)
-                    Packs.Add(new QuestionPackViewModel(pack));
+                {
+                    var vm = new QuestionPackViewModel(pack) { AvailableCategories = Categories };
+                    Packs.Add(vm);
+                }
+
                 ActivePack = Packs.FirstOrDefault(p => p.Name == "C#frågor") ?? Packs.FirstOrDefault();
             });
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                ActivePack = Packs.FirstOrDefault();
-            });
+            _dialogService.ShowError($"Failed to load from MongoDB: {ex.Message}");
+            Application.Current.Dispatcher.Invoke(() => ActivePack = Packs.FirstOrDefault());
+        }
+    }
+
+    private async Task CreateNewPackAsync()
+    {
+        try
+        {
+            var pack = new QuestionPack { Name = "New Pack" };
+            await _storageService.CreatePackAsync(pack);
+
+            var packViewModel = new QuestionPackViewModel(pack) { AvailableCategories = Categories };
+            Packs.Add(packViewModel);
+            ActivePack = packViewModel;
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowError($"Failed to create pack: {ex.Message}");
+        }
+    }
+
+    private async Task RemoveQuestionPackAsync()
+    {
+        if (ActivePack == null) return;
+
+        if (!_dialogService.ShowConfirm($"Delete pack '{ActivePack.Name}'?", "Delete Pack"))
+            return;
+
+        try
+        {
+            await _storageService.DeletePackAsync(ActivePack.Model.Id);
+            Packs.Remove(ActivePack);
+            ActivePack = Packs.FirstOrDefault();
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowError($"Failed to delete pack: {ex.Message}");
         }
     }
 
@@ -135,8 +174,9 @@ public class MainWindowViewModel : ViewModelBase
     {
         try
         {
-            var packs = Packs.Select(p => p.Model).ToList();
-            await _storageService.SavePacksAsync(packs);
+            foreach (var pack in Packs.Select(p => p.Model))
+                await _storageService.UpdatePackAsync(pack);
+
             if (showMessage)
                 _dialogService.ShowInfo("Packs saved successfully.");
         }
@@ -157,5 +197,32 @@ public class MainWindowViewModel : ViewModelBase
             getSelected: () => ActivePack,
             saveAll: async () => await SaveAllAsync(showMessage: false)
         );
+    }
+
+    private void ManageCategories()
+    {
+        try
+        {
+
+            var vm = new ManageCategoriesViewModel(_storageService, _dialogService, Categories);
+            var dlg = new Labb3_Quiz_MongoDB.Views.Dialogs.ManageCategoriesDialog
+            {
+                DataContext = vm,
+                Owner = Application.Current.MainWindow
+            };
+            dlg.ShowDialog();
+
+
+            foreach (var p in Packs)
+            {
+                if (!ReferenceEquals(p.AvailableCategories, Categories))
+                    p.AvailableCategories = Categories;
+                p.RaisePropertyChanged(nameof(QuestionPackViewModel.SelectedCategory));
+            }
+        }
+        catch (Exception ex)
+        {
+            _dialogService.ShowError($"Could not open category manager: {ex.Message}");
+        }
     }
 }

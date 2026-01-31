@@ -7,7 +7,6 @@ using System.Net.Http;
 
 namespace Labb3_Quiz.ViewModels;
 
-// ViewModel för import-dialog (hämtar frågor från API → mappar till Question → sparar till pack)
 public class ImportQuestionsViewModel : ViewModelBase
 {
     private readonly ITriviaService _trivia;
@@ -80,7 +79,6 @@ public class ImportQuestionsViewModel : ViewModelBase
     public DelegateCommand ImportCommand { get; }
     public DelegateCommand CancelCommand { get; }
 
-    // Sätts av DialogService när dialogen öppnas
     public Func<QuestionPackViewModel?> GetSelectedPack { get; set; } = () => null;
     public Func<Task> SaveAllAsync { get; set; } = () => Task.CompletedTask;
 
@@ -93,7 +91,6 @@ public class ImportQuestionsViewModel : ViewModelBase
         CancelCommand = new DelegateCommand(_ => _cts?.Cancel(), _ => IsBusy);
     }
 
-    // Hämtar kategorier från API (HTTP GET → JSON → deserialisering)
     private async Task LoadCategoriesAsync()
     {
         try
@@ -126,7 +123,6 @@ public class ImportQuestionsViewModel : ViewModelBase
         }
     }
 
-    // Importerar frågor från API (HTTP GET → JSON → mappar till Question → lägger till i pack → sparar till JSON)
     private async Task ImportAsync()
     {
         _cts = new CancellationTokenSource();
@@ -171,7 +167,6 @@ public class ImportQuestionsViewModel : ViewModelBase
                 return;
             }
 
-            // Mappar OpenTdbQuestion (API) → Question (vår modell) och blandar alternativ
             var mappedQuestions = data.Results
                 .Where(r => r.Type == "multiple" && r.Incorrect_Answers.Count >= 3)
                 .Select(r =>
@@ -184,7 +179,6 @@ public class ImportQuestionsViewModel : ViewModelBase
 
                     if (options.Count != 4) return null;
 
-                    // Blanda alternativ slumpmässigt (Fisher-Yates)
                     var rng = new Random();
                     for (int i = options.Count - 1; i > 0; i--)
                     {
