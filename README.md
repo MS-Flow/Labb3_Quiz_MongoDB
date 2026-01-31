@@ -1,5 +1,13 @@
-## Labb 3 – Quiz Configurator
-Detta är min tredje inlämningsuppgift i Programmering med C#, ungefär två månader in i kursen. (November 2025)
+## Labb 3 – Quiz Configurator med MongoDB 
+Applikationen är uppdaterad så att **Question Packs + frågor** lagras i **MongoDB** (via `MongoDB.Driver`) istället för i JSON-filer.
+
+Appen använder dessa environment variables om du vill ändra från standard:
+- `MONGODB_CONNECTION_STRING` (default: `mongodb://localhost:27017`)
+- `MONGODB_DATABASE` (default: **`MelvinEdlund`** – förnamn+efternamn utan mellanslag)
+
+- Vid första körning skapas collections: `questionPacks` och `categories`.
+- Om DB är tom seedas `questionPacks` från `Resources/packs.json`.
+- Om `categories` är tom seedas några startkategorier (kan hanteras i appen via “Manage Categories…”).
 
 ### Uppgift
 Programmet är ett WPF-verktyg där användaren kan skapa och redigera frågepaket till ett quiz. Det stödjer import/export av JSON, hämtning av externa frågor via API och är byggt enligt MVVM med DataBinding, Commands och dialogrutor.
@@ -23,3 +31,4 @@ Programmet är ett WPF-verktyg där användaren kan skapa och redigera frågepak
 
 **Importdialog:**  
 ![FilesTab](bilder/labb3_4.png) ![Importdialog](bilder/labb3_5.png) ![Importdialog](bilder/labb3_6.png)
+
