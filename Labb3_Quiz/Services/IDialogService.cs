@@ -2,7 +2,6 @@ using Labb3_Quiz.ViewModels;
 
 namespace Labb3_Quiz.Services;
 
-// Interface för dialoger
 public interface IDialogService
 {
     void ShowInfo(string message, string title = "Information");
