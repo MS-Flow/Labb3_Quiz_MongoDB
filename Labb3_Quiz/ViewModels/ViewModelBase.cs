@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace Labb3_Quiz.ViewModels;
 
-// Basklass för ViewModels - hanterar property change notifications
 public class ViewModelBase : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;

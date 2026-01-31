@@ -3,7 +3,6 @@ using Labb3_Quiz.ViewModels;
 
 namespace Labb3_Quiz.Views.Dialogs;
 
-// (binder till QuestionPackViewModel)
 public partial class PackOptionsDialog : Window
 {
     public PackOptionsDialog(QuestionPackViewModel packViewModel)

@@ -4,7 +4,6 @@ using Labb3_Quiz.ViewModels;
 
 namespace Labb3_Quiz.Views.Dialogs;
 
-// (laddar kategorier från API vid öppning)
 public partial class ImportQuestionsDialog : Window
 {
     public ImportQuestionsDialog()
