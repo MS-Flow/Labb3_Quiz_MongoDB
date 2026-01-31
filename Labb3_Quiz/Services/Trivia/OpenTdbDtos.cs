@@ -1,6 +1,5 @@
 namespace Labb3_Quiz.Services.Trivia;
 
-// DTO:er för API-responser (JSON → C#-objekt via deserialisering)
 public class OpenTdbCategoryListResponse
 {
     public List<OpenTdbCategory> Trivia_Categories { get; set; } = new();
@@ -12,14 +11,12 @@ public class OpenTdbCategory
     public string Name { get; set; } = "";
 }
 
-// Response-kod: 0=OK, 1=NoResults, 2=InvalidParam, 3=TokenNotFound, 4=TokenEmpty
 public class OpenTdbQuestionResponse
 {
     public int Response_Code { get; set; }
     public List<OpenTdbQuestion> Results { get; set; } = new();
 }
 
-// Text är URL- och HTML-kodad (måste dekodas)
 public class OpenTdbQuestion
 {
     public string Category { get; set; } = "";

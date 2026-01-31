@@ -5,7 +5,6 @@ using System.Text.Json;
 
 namespace Labb3_Quiz.Services.Trivia;
 
-// hämta data från OpenTDB API (HTTP GET → JSON → C#-objekt)
 public class OpenTdbService : ITriviaService
 {
     private readonly HttpClient _http;
@@ -19,7 +18,6 @@ public class OpenTdbService : ITriviaService
         _http.Timeout = TimeSpan.FromSeconds(15);
     }
 
-    // Hämtar kategorier från API (deserialiserar JSON → OpenTdbCategoryListResponse)
     public async Task<List<OpenTdbCategory>> GetCategoriesAsync(CancellationToken ct = default)
     {
         try
@@ -36,7 +34,6 @@ public class OpenTdbService : ITriviaService
         }
     }
 
-    // Hämtar frågor från API (bygg URL → HTTP GET → deserialisera JSON → dekoda text)
     public async Task<OpenTdbQuestionResponse> GetQuestionsAsync(
         int amount, int? categoryId, string? difficulty, CancellationToken ct = default)
     {
@@ -64,7 +61,6 @@ public class OpenTdbService : ITriviaService
             var data = JsonSerializer.Deserialize<OpenTdbQuestionResponse>(json, options)
                        ?? new OpenTdbQuestionResponse();
 
-            // Dekoda URL- och HTML-kodad text (t.ex. "What%20is%20C%23%3F" → "What is C#?")
             foreach (var q in data.Results)
             {
                 q.Question = DecodeText(q.Question);
@@ -84,7 +80,6 @@ public class OpenTdbService : ITriviaService
         }
     }
 
-    // Dekoderar URL- och HTML-kodad text från API
     private static string DecodeText(string encodedText)
     {
         if (string.IsNullOrEmpty(encodedText)) return encodedText;
@@ -92,4 +87,3 @@ public class OpenTdbService : ITriviaService
         return WebUtility.HtmlDecode(urlDecoded);
     }
 }
-
